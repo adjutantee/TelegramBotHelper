@@ -84,7 +84,7 @@ class Program
                                         {
                                             await botClient.SendTextMessageAsync(
                                                 message.Chat.Id,
-                                                text: $"Неизвестная ошибка или вводимые данные были некорректны. Подробнее в консоли разработчика.");
+                                                text: $"Неизвестная ошибка или вводимые данные были некорректны.");
                                         }
 
                                         break;
