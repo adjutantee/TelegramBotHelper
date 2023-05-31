@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using TelegramBotHelper.DbContexts;
 
 namespace TelegramBotHelper.Models
 {
@@ -8,5 +10,10 @@ namespace TelegramBotHelper.Models
         public int Id { get; set; }
         [Required]
         public string WordsName { get; set; }
+
+        public async Task<List<BlacklistOfWords>> GetAllBlacklistWords(ApplicationDbContext db)
+        {
+            return await db._BlacklistOfWords.ToListAsync();
+        }
     }
 }

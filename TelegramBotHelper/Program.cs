@@ -109,6 +109,16 @@ class Program
                             replyToMessageId: message.MessageId,
                             text: "Данный чат не является групповым или супергрупповым.");
                     }
+                break;
+                case string text when text.Contains("/wordsinfo"):
+                        var blacklist = new BlacklistOfWords();
+                        var allWords = await blacklist.GetAllBlacklistWords(db);
+
+                        // Process the list of words (allWords) as per your requirements
+                        // For example, you can send them as a message using botClient
+
+                        string wordsInfo = string.Join(", ", allWords.Select(word => word.WordsName));
+                        await botClient.SendTextMessageAsync(message.Chat.Id, text: $"Blacklisted words: {wordsInfo}");
                     break;
             }
         }
