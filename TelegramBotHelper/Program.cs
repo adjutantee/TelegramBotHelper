@@ -10,7 +10,7 @@ class Program
 {
     static void Main(string[] args)
     {
-        var client = new TelegramBotClient("6089349486:AAGnnEaOITkmUIyEbDpEpBw-gE1R0l9OrLs");
+        var client = new TelegramBotClient("YOUR TOKEN");
         client.StartReceiving(Update, Error);
         Console.ReadLine();
     }
@@ -28,12 +28,6 @@ class Program
                     await botClient.DeleteMessageAsync(
                         message.Chat.Id, 
                         message.MessageId);
-
-                    //await botClient.SendTextMessageAsync(
-                    //    message.Chat.Id,
-                    //    text: $"Пользователь {message.From.FirstName}, в вашем последнем сообщении мною было обнаружено слово или несколько слов, входящих в черный список " +
-                    //    $"этой группы, в следствии чего я вынужден был удалить ваше последнее сообщение а так же выдать вам предупреждение. Если вы считаете что это ошибка, " +
-                    //    $"обратитесь к администрации группы.");
                 break;
                 case string text when db._CommandsName.Any(w => text.Contains(w.CommandName)):
                     // Получение информации о пользователе
