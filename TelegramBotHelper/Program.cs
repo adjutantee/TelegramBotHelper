@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -30,7 +31,7 @@ class Program
                         $"этой группы, в следствии чего я вынужден был удалить ваше последнее сообщение а так же выдать вам предупреждение. Если вы считаете что это ошибка, " +
                         $"обратитесь к администрации группы.");
                     break;
-                case string text when text.Contains("/addblacklist"):
+                case string text when db._CommandsName.Any(w => text.Contains(w.CommandName)):
                     // Получение информации о пользователе
                     User sender = message.From;
                     // Получение информацию о чате | группе
@@ -54,12 +55,15 @@ class Program
                                 {
                                     if (fUpdate.Type == UpdateType.Message && fUpdate.Message.Type == MessageType.Text)
                                     {
-                                        string command = "/addblacklist";
+                                        string addCommand = "/addblacklist";
+                                        string infoCommand = "/wordsinfo";
+                                        string wordDeleteCommand = "/deleteword";
+                                        string helpCommand = "/help";
                                         string input = fUpdate.Message.Text;
 
-                                        if (input.StartsWith(command))
+                                        if (input.StartsWith(addCommand))
                                         {
-                                            string[] words = input.Substring(command.Length).Trim().Split(',');
+                                            string[] words = input.Substring(addCommand.Length).Trim().Split(',');
 
                                             if (string.IsNullOrEmpty(words[0]))
                                             {
@@ -80,6 +84,56 @@ class Program
                                                 message.Chat.Id,
                                                 text: $"Следующие слова '{string.Join(", ", words)}' были успешно добавлены в черный список");
                                         }
+
+                                        else if (input.StartsWith(infoCommand))
+                                        {
+                                            var blacklist = new BlacklistOfWords();
+                                            var allWords = await blacklist.GetAllBlacklistWords(db);
+
+                                            string wordsInfo = string.Join(", ", allWords.Select(word => word.WordsName));
+                                            await botClient.SendTextMessageAsync(
+                                                message.Chat.Id,
+                                                text: $"Список слов в черном списке: {wordsInfo}");
+                                        }
+
+                                        else if (input.StartsWith(wordDeleteCommand))
+                                        {
+                                            string[] words = input.Substring(wordDeleteCommand.Length).Trim().Split(',');
+
+                                            if (string.IsNullOrEmpty(words[0]))
+                                            {
+                                                await botClient.SendTextMessageAsync(
+                                                    message.Chat.Id,
+                                                    text: $"Возможно вводимые данные были некорректны. Пожалуйста, вводите данные по следующему формату - /deleteword Word1, Word2, Word3 ");
+                                                break;
+                                            }
+
+                                            foreach (string word in words)
+                                            {
+                                                var blackListWord = await db._BlacklistOfWords.FirstOrDefaultAsync(x => x.WordsName == word.Trim());
+                                                if (blackListWord != null)
+                                                {
+                                                    db.Remove(blackListWord);
+                                                }
+                                            }
+
+                                            await db.SaveChangesAsync();
+                                            await botClient.SendTextMessageAsync(
+                                                message.Chat.Id,
+                                                text: $"Следующие слова '{string.Join(", ", words)}' были успешно удалены из черного списка!");
+                                        }
+
+                                        else if (input.StartsWith(helpCommand))
+                                        {
+                                            var commandInfo = new CommandsName();
+                                            var allComand = await commandInfo.GetAllCommands(db);
+
+                                            string comandInfo = string.Join(", ", allComand.Select(x => x.CommandName));
+                                            await botClient.SendTextMessageAsync(
+                                                message.Chat.Id,
+                                                text: $"Список всех доступных команд: {comandInfo}");
+                                        }
+
                                         else
                                         {
                                             await botClient.SendTextMessageAsync(
@@ -110,13 +164,6 @@ class Program
                             text: "Данный чат не является групповым или супергрупповым.");
                     }
                 break;
-                case string text when text.Contains("/wordsinfo"):
-                        var blacklist = new BlacklistOfWords();
-                        var allWords = await blacklist.GetAllBlacklistWords(db);
-
-                        string wordsInfo = string.Join(", ", allWords.Select(word => word.WordsName));
-                        await botClient.SendTextMessageAsync(message.Chat.Id, text: $"Blacklisted words: {wordsInfo}");
-                    break;
             }
         }
     }

@@ -20,6 +20,15 @@ namespace TelegramBotHelper.DbContexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<BlacklistOfWords>().HasData(new List<BlacklistOfWords>()
+            {
+                new BlacklistOfWords
+                {
+                    Id = 1,
+                    WordsName = "Stupid"
+                }
+            });
+            
             modelBuilder.Entity<CommandsName>().HasData(new List<CommandsName>()
             {
                 new CommandsName
@@ -36,7 +45,12 @@ namespace TelegramBotHelper.DbContexts
                 {
                     Id = 3,
                     CommandName = "/deleteword"
-                }
+                },
+                new CommandsName
+                {
+                    Id = 4,
+                    CommandName = "/help"
+                },
             });
         }
     }

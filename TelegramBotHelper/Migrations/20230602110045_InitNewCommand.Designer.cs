@@ -11,8 +11,8 @@ using TelegramBotHelper.DbContexts;
 namespace TelegramBotHelper.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230602094341_InitNewDatabase")]
-    partial class InitNewDatabase
+    [Migration("20230602110045_InitNewCommand")]
+    partial class InitNewCommand
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -38,6 +38,13 @@ namespace TelegramBotHelper.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("_BlacklistOfWords");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            WordsName = "Stupid"
+                        });
                 });
 
             modelBuilder.Entity("TelegramBotHelper.Models.CommandsName", b =>
@@ -71,6 +78,11 @@ namespace TelegramBotHelper.Migrations
                         {
                             Id = 3,
                             CommandName = "/deleteword"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CommandName = "/help"
                         });
                 });
 #pragma warning restore 612, 618
