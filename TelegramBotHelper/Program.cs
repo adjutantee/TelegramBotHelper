@@ -24,13 +24,17 @@ class Program
         {
             switch (message.Text.ToLower())
             {
-                case string text when text.Contains("test"):
-                    await botClient.SendTextMessageAsync(
-                        message.Chat.Id,
-                        text: $"Пользователь {message.From.FirstName}, в вашем последнем сообщении мною было обнаружено слово или несколько слов, входящих в черный список " +
-                        $"этой группы, в следствии чего я вынужден был удалить ваше последнее сообщение а так же выдать вам предупреждение. Если вы считаете что это ошибка, " +
-                        $"обратитесь к администрации группы.");
-                    break;
+                case string text when db._BlacklistOfWords.AsEnumerable().Any(x => string.Equals(text, x.WordsName, StringComparison.OrdinalIgnoreCase)):
+                    await botClient.DeleteMessageAsync(
+                        message.Chat.Id, 
+                        message.MessageId);
+
+                    //await botClient.SendTextMessageAsync(
+                    //    message.Chat.Id,
+                    //    text: $"Пользователь {message.From.FirstName}, в вашем последнем сообщении мною было обнаружено слово или несколько слов, входящих в черный список " +
+                    //    $"этой группы, в следствии чего я вынужден был удалить ваше последнее сообщение а так же выдать вам предупреждение. Если вы считаете что это ошибка, " +
+                    //    $"обратитесь к администрации группы.");
+                break;
                 case string text when db._CommandsName.Any(w => text.Contains(w.CommandName)):
                     // Получение информации о пользователе
                     User sender = message.From;

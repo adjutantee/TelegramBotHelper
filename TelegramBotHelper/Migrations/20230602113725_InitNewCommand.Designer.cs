@@ -11,7 +11,7 @@ using TelegramBotHelper.DbContexts;
 namespace TelegramBotHelper.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230602110045_InitNewCommand")]
+    [Migration("20230602113725_InitNewCommand")]
     partial class InitNewCommand
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
