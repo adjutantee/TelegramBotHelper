@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
+using System.Text.RegularExpressions;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -10,7 +11,7 @@ class Program
 {
     static void Main(string[] args)
     {
-        var client = new TelegramBotClient("YOUR TOKEN");
+        var client = new TelegramBotClient("6089349486:AAGvE0mMFv__xPjH9Ovjiq1OvoU78gNLwdA");
         client.StartReceiving(Update, Error);
         Console.ReadLine();
     }
@@ -24,11 +25,13 @@ class Program
         {
             switch (message.Text.ToLower())
             {
-                case string text when db._BlacklistOfWords.AsEnumerable().Any(x => string.Equals(text, x.WordsName, StringComparison.OrdinalIgnoreCase)):
+                case string text when db._BlacklistOfWords.AsEnumerable().Any(x =>
+                    Regex.IsMatch(text, $@"\b{x.WordsName}\b", RegexOptions.IgnoreCase)):
                     await botClient.DeleteMessageAsync(
-                        message.Chat.Id, 
+                        message.Chat.Id,
                         message.MessageId);
-                break;
+                    break;
+
                 case string text when db._CommandsName.Any(w => text.Contains(w.CommandName)):
                     // Получение информации о пользователе
                     User sender = message.From;
@@ -161,7 +164,7 @@ class Program
                             replyToMessageId: message.MessageId,
                             text: "Данный чат не является групповым или супергрупповым.");
                     }
-                break;
+                    break;
             }
         }
     }
@@ -171,5 +174,4 @@ class Program
         Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(exception));
         return Task.FromResult("Результат ошибки");
     }
-
 }
